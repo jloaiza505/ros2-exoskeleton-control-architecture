@@ -73,6 +73,26 @@ Success criteria:
 - Controller consumes adaptation topic.
 - Parameter updates visibly change torque profile.
 
+### N1.5 - OpenSim-Driven Simulation Input
+
+- Extend `exo_simulation` to support OpenSim gait file playback (`.mot` / `.sto`) in addition to synthetic sinusoidal generation.
+- Add runtime-selectable simulator source mode:
+  - `synthetic`
+  - `opensim_file`
+- Add interpolation-based playback at ROS publish rate.
+- Map playback data into existing `RawSensorData` interface:
+  - joint angle
+  - derived/loaded angular velocity
+  - IMU proxy signals
+  - contact proxy/event stream
+
+Success criteria:
+
+- Simulator can load and replay a provided OpenSim gait file.
+- `/exo/sensing/raw` remains contract-compatible for downstream nodes.
+- Playback can loop and support time scaling.
+- Demo run shows more realistic gait signal behavior than baseline sinusoid.
+
 ### N2 - Deterministic Fault Policy Expansion
 
 - Enforce severity mapping and escalation rules in fault manager.

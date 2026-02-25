@@ -288,6 +288,10 @@ Initial implementation targets simulation-only validation with:
 
 Hardware integration starts only after end-to-end stack behavior is validated.
 
+Planned enhancement:
+
+- Add file-driven simulation mode in `exo_simulation` to replay OpenSim gait datasets (`.mot` / `.sto`) and publish realistic `RawSensorData` while preserving current message contracts.
+
 ## 10. Single Source of Truth Strategy
 
 To keep implementation professional and consistent:
