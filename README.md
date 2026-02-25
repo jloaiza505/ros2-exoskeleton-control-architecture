@@ -34,6 +34,7 @@ In other words, we will not be controlling position but rather modulating torque
 
 The system-level operation modes will be:
 
+- Startup (initialization and supervision warm-up)
 - Idle (no torque output)
 - Calibration
 - Assistive mode

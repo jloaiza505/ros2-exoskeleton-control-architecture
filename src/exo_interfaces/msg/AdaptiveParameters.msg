@@ -1,0 +1,5 @@
+std_msgs/Header header
+float64 assistance_gain
+float64 torque_profile_scale
+float64 timing_offset_s
+float64 safety_scale

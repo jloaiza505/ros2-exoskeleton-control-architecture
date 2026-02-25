@@ -1,0 +1,6 @@
+/**:
+  ros__parameters:
+    sensing_qos_reliability: best_effort
+    sensing_qos_depth: 10
+    control_qos_reliability: reliable
+    control_qos_depth: 5

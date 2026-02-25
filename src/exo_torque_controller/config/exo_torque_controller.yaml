@@ -1,0 +1,8 @@
+/**:
+  ros__parameters:
+    fused_state_topic: /exo/state/fused
+    gait_phase_topic: /exo/gait/phase
+    mode_state_topic: /exo/system/mode
+    torque_command_topic: /exo/control/torque_command
+    max_torque_nm: 25.0
+    velocity_damping_gain: 1.5

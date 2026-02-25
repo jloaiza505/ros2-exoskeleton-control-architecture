@@ -1,0 +1,6 @@
+std_msgs/Header header
+float64 joint_angle_rad
+float64 joint_velocity_rad_s
+float64 joint_acceleration_rad_s2
+float64 contact_probability
+float64 phase_progress_hint

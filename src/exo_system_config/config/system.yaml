@@ -1,0 +1,14 @@
+/**:
+  ros__parameters:
+    default_mode: STARTUP
+    valid_modes: [STARTUP, IDLE, CALIBRATION, ASSISTIVE, FAULT]
+
+    sensing_rate_hz: 500
+    state_estimation_rate_hz: 400
+    gait_phase_rate_hz: 150
+    torque_control_rate_hz: 500
+    adaptation_rate_hz: 5
+
+    max_torque_nm: 25.0
+    max_torque_rate_nm_s: 120.0
+    torque_ramp_down_nm_s: 200.0

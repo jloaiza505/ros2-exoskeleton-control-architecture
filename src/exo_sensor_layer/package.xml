@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>exo_sensor_layer</name>
+  <version>0.1.0</version>
+  <description>exo_sensor_layer package for the ROS 2 exoskeleton control architecture.</description>
+  <maintainer email="jaime@example.com">Jaime</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>rclcpp</depend>
+  <depend>std_msgs</depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

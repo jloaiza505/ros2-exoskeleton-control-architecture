@@ -1,0 +1,14 @@
+/**:
+  ros__parameters:
+    raw_sensor_topic: /exo/sensing/raw
+    fused_state_topic: /exo/state/fused
+    gait_phase_topic: /exo/gait/phase
+    torque_command_topic: /exo/control/torque_command
+    fault_event_topic: /exo/fault/event
+    mode_state_topic: /exo/system/mode
+    check_period_ms: 20
+    mode_change_grace_period_ms: 250
+    raw_sensor_timeout_ms: 100
+    fused_state_timeout_ms: 150
+    gait_phase_timeout_ms: 200
+    torque_command_timeout_ms: 300

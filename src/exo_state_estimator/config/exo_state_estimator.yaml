@@ -1,0 +1,5 @@
+/**:
+  ros__parameters:
+    raw_sensor_topic: /exo/sensing/raw
+    fused_state_topic: /exo/state/fused
+    contact_alpha: 0.2

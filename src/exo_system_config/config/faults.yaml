@@ -1,0 +1,15 @@
+/**:
+  ros__parameters:
+    sensor_layer_timeout_ms: 5
+    state_estimator_timeout_ms: 10
+    gait_detector_timeout_ms: 20
+    controller_timeout_ms: 5
+
+    encoder_dropout_timeout_ms: 4
+    imu_dropout_timeout_ms: 4
+    contact_dropout_timeout_ms: 10
+
+    stall_torque_error_percent_threshold: 15.0
+    stall_duration_ms: 10
+
+    imu_failure_torque_scale: 0.7

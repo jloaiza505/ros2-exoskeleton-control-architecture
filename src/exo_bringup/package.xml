@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>exo_bringup</name>
+  <version>0.1.0</version>
+  <description>exo_bringup package for the ROS 2 exoskeleton control architecture.</description>
+  <maintainer email="jaime@example.com">Jaime</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>rclcpp</depend>
+  <depend>std_msgs</depend>
+
+  <exec_depend>exo_system_config</exec_depend>
+  <exec_depend>exo_simulation</exec_depend>
+  <exec_depend>exo_state_estimator</exec_depend>
+  <exec_depend>exo_gait_phase_detector</exec_depend>
+  <exec_depend>exo_fault_manager</exec_depend>
+  <exec_depend>exo_torque_controller</exec_depend>
+  <exec_depend>exo_watchdog</exec_depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

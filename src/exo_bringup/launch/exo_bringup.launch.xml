@@ -1,0 +1,42 @@
+<launch>
+  <arg name="use_sim_time" default="false"/>
+
+  <node pkg="exo_simulation" exec="simulation_node" name="simulation_node" output="screen">
+    <param from="$(find-pkg-share exo_system_config)/config/system.yaml"/>
+    <param from="$(find-pkg-share exo_system_config)/config/topics.yaml"/>
+    <param from="$(find-pkg-share exo_simulation)/config/exo_simulation.yaml"/>
+    <param name="use_sim_time" value="$(var use_sim_time)"/>
+  </node>
+
+  <node pkg="exo_state_estimator" exec="state_estimator_node" name="state_estimator_node" output="screen">
+    <param from="$(find-pkg-share exo_system_config)/config/topics.yaml"/>
+    <param from="$(find-pkg-share exo_state_estimator)/config/exo_state_estimator.yaml"/>
+    <param name="use_sim_time" value="$(var use_sim_time)"/>
+  </node>
+
+  <node pkg="exo_gait_phase_detector" exec="gait_phase_detector_node" name="gait_phase_detector_node" output="screen">
+    <param from="$(find-pkg-share exo_system_config)/config/topics.yaml"/>
+    <param from="$(find-pkg-share exo_gait_phase_detector)/config/exo_gait_phase_detector.yaml"/>
+    <param name="use_sim_time" value="$(var use_sim_time)"/>
+  </node>
+
+  <node pkg="exo_fault_manager" exec="fault_manager_node" name="fault_manager_node" output="screen">
+    <param from="$(find-pkg-share exo_system_config)/config/topics.yaml"/>
+    <param from="$(find-pkg-share exo_fault_manager)/config/exo_fault_manager.yaml"/>
+    <param name="use_sim_time" value="$(var use_sim_time)"/>
+  </node>
+
+  <node pkg="exo_torque_controller" exec="torque_controller_node" name="torque_controller_node" output="screen">
+    <param from="$(find-pkg-share exo_system_config)/config/system.yaml"/>
+    <param from="$(find-pkg-share exo_system_config)/config/topics.yaml"/>
+    <param from="$(find-pkg-share exo_torque_controller)/config/exo_torque_controller.yaml"/>
+    <param name="use_sim_time" value="$(var use_sim_time)"/>
+  </node>
+
+  <node pkg="exo_watchdog" exec="watchdog_node" name="watchdog_node" output="screen">
+    <param from="$(find-pkg-share exo_system_config)/config/faults.yaml"/>
+    <param from="$(find-pkg-share exo_system_config)/config/topics.yaml"/>
+    <param from="$(find-pkg-share exo_watchdog)/config/exo_watchdog.yaml"/>
+    <param name="use_sim_time" value="$(var use_sim_time)"/>
+  </node>
+</launch>

@@ -1,0 +1,9 @@
+/**:
+  ros__parameters:
+    fault_event_topic: /exo/fault/event
+    mode_state_topic: /exo/system/mode
+    set_mode_service: /exo/system/set_mode
+    initial_mode: STARTUP
+    startup_mode_duration_ms: 1000
+    mode_publish_rate_hz: 5.0
+    fault_severity_threshold: 2

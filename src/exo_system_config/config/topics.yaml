@@ -1,0 +1,10 @@
+/**:
+  ros__parameters:
+    raw_sensor_topic: /exo/sensing/raw
+    fused_state_topic: /exo/state/fused
+    gait_phase_topic: /exo/gait/phase
+    adaptive_parameters_topic: /exo/adaptation/parameters
+    torque_command_topic: /exo/control/torque_command
+    fault_event_topic: /exo/fault/event
+    mode_state_topic: /exo/system/mode
+    set_mode_service: /exo/system/set_mode

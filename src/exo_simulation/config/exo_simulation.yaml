@@ -1,0 +1,6 @@
+/**:
+  ros__parameters:
+    raw_sensor_topic: /exo/sensing/raw
+    publish_rate_hz: 200.0
+    gait_frequency_hz: 1.0
+    knee_amplitude_rad: 0.6
