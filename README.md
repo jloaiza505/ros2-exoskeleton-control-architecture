@@ -180,13 +180,231 @@ Explicit design rules to follow:
 
 ## 8. Failure & Robustness Assumptions
 
-Define now:
+### 8.1 Failure Model Definitions
+#### 1. Sensor Dropout
+##### Definition
 
-- Sensor dropout possible
-- Delayed messages possible
-- Node restart possible
-- Actuator stall possible
+A sensor is considered in dropout if:
 
-Architecture must tolerate:
-- Graceful degradation
-- Controlled shutdown
+1. No message received within 2× expected period, or
+2. Message timestamp drift exceeds tolerance threshold.
+
+##### Example thresholds:
+
+- Encoder @ 500 Hz → timeout > 4 ms
+- IMU @ 500 Hz → timeout > 4 ms
+- Contact @ 200 Hz → timeout > 10 ms
+
+##### Severity Levels
+
+Level 1 — Transient Dropout
+- Single missed message
+- System continues operating
+
+Level 2 — Persistent Dropout
+- Timeout exceeds threshold
+- Degrade estimation
+
+Level 3 — Critical Dropout
+- Encoder missing
+- Immediate transition to FAULT mode
+
+#### 2. Delayed Messages
+##### Definition
+
+A message is delayed if:
+
+      (current_time - message_timestamp) > latency_budget
+
+##### Example latency budgets:
+
+- State estimate: 5 ms
+- Gait phase: 10 ms
+- Torque command: 2 ms
+
+##### Handling Strategy
+
+1. If delayed but valid → discard message
+2. If delay persistent → degrade to safe mode
+3. If control-layer message delayed → zero torque
+
+####  3. Node Restart / Crash
+##### Definition
+
+A node is considered failed if:
+
+1. It stops publishing within defined timeout
+2. Lifecycle state transitions unexpectedly
+3. Process exits
+
+##### Monitoring
+
+Watchdog node monitors:
+- State estimator
+- Gait detector
+- Torque controller
+
+##### Reaction Levels
+
+Non-critical node restart (e.g., adaptation):
+
+- Freeze last known safe parameters
+- Continue assistive mode
+
+Critical node restart (state estimator or controller):
+
+- Immediate torque zero 
+- Transition to FAULT
+
+#### 4. Actuator Stall
+##### Definition
+
+Actuator stall is detected if:
+
+1. Commanded torque ≠ measured torque beyond threshold
+2. Velocity ≈ 0 while torque command high
+3. Driver fault flag raised
+
+Threshold example:
+
+      |command − measured| > 15% for > 10 ms
+
+##### Response
+
+- First event → torque ramp-down
+- Persistent stall → FAULT mode
+- Log diagnostic
+
+---
+### 8.2 Robustness Behavior Definitions
+
+#### 1. Graceful Degradation
+
+System continues operating with reduced capability when possible.
+
+##### Example Scenarios
+
+IMU Failure:
+
+- Disable orientation-based estimation
+- Use encoder-only estimation
+- Reduce torque gain by 30%
+
+Contact Sensor Failure:
+
+- Switch to kinematic-based phase detection
+- Reduce confidence metric
+
+Adaptation Failure:
+
+- Freeze adaptive parameters
+- Continue fixed assistance
+
+Principle:
+
+Remove intelligence before removing torque.
+
+#### 2. Controlled Shutdown
+
+Triggered when:
+
+- Encoder lost
+- Torque control failure
+- Actuator stall persistent
+- Watchdog timeout
+
+Controlled Shutdown Behavior
+
+- Immediately ramp torque to zero within safe rate
+- Disable controller output
+- Transition to FAULT mode
+- Log failure state
+- Require manual reset
+
+No abrupt torque cut unless hardware E-stop.
+
+---
+### 8.3 Watchdog Specification
+
+Monitors:
+
+1. Topic liveliness
+2. Timestamp freshness
+3. Control loop period jitter
+4. Node lifecycle state
+
+Watchdog timeouts:
+
+| Component       | Timeout |
+| --------------- | ------- |
+| Sensor layer    | 5 ms    |
+| State estimator | 10 ms   |
+| Gait detector   | 20 ms   |
+| Controller      | 5 ms    |
+
+If timeout exceeded:
+
+- Trigger degradation or shutdown based on criticality.
+
+---
+### 8.4 Criticality Classification
+
+Defines system components by level of criticality.
+
+Critical (Failure → Immediate FAULT):
+- Encoder
+- Torque controller
+- Hardware interface
+
+Medium (Failure → Degrade):
+- IMU
+- Gait detector
+
+Low (Failure → Freeze):
+- Adaptation layer
+- Logging
+
+---
+### 8.5 Fault Escalation Policy
+
+Escalation ladder will follow
+1. Warning
+2. Degraded mode
+3. Torque reduction
+4. Controlled shutdown
+5. Hardware E-stop
+
+---
+### 8.6 Deterministic Recovery Policy
+
+After FAULT:
+
+1. Torque remains zero
+2. All nodes must reinitialize
+3. Calibration required before returning to Assist mode
+
+No automatic return to assistive mode.
+
+---
+### 8.7 Logging & Diagnostics Requirements
+
+On any failure event, logs will include:
+
+- Timestamp
+- Failure type
+- Node involved
+- Last torque command
+- Last state estimate
+
+Persistent log storage is required for future analysis.
+
+---
+### 8.8 Summary Design Rules
+
+1. **No uncontrolled torque.**
+2. **No silent failure.**
+3. **No cyclic dependencies.**
+4. **Every critical topic has a timeout.**
+5. **Every failure has a deterministic response.**
+6. **Degradation preferred over shutdown when safe.**
+7. **Hardware limits override software decisions.**
