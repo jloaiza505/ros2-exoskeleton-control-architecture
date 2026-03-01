@@ -1,0 +1,25 @@
+/**:
+  ros__parameters:
+    fused_state_topic: /exo/state/fused
+    gait_phase_topic: /exo/gait/phase
+    mode_state_topic: /exo/system/mode
+    adaptive_parameters_topic: /exo/adaptation/parameters
+    publish_rate_hz: 5.0
+    input_timeout_s: 0.5
+    nominal_velocity_rad_s: 2.0
+    calibration_complete: true
+    base_assistance_gain: 1.0
+    base_torque_profile_scale: 1.0
+    base_timing_offset_s: 0.0
+    base_safety_scale: 1.0
+    min_assistance_gain: 0.0
+    max_assistance_gain: 1.5
+    min_torque_profile_scale: 0.5
+    max_torque_profile_scale: 1.5
+    min_timing_offset_s: -0.2
+    max_timing_offset_s: 0.2
+    min_safety_scale: 0.0
+    max_safety_scale: 1.0
+    patient_mass_kg: 75.0
+    patient_height_m: 1.75
+    exo_lever_length_m: 0.35

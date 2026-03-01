@@ -10,12 +10,15 @@
 
   <depend>rclcpp</depend>
   <depend>std_msgs</depend>
+  <depend>std_srvs</depend>
+  <depend>exo_interfaces</depend>
 
   <exec_depend>exo_system_config</exec_depend>
   <exec_depend>exo_simulation</exec_depend>
   <exec_depend>exo_state_estimator</exec_depend>
   <exec_depend>exo_gait_phase_detector</exec_depend>
   <exec_depend>exo_fault_manager</exec_depend>
+  <exec_depend>exo_calibration</exec_depend>
   <exec_depend>exo_torque_controller</exec_depend>
   <exec_depend>exo_watchdog</exec_depend>
 

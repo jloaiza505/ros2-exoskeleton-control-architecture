@@ -7,4 +7,12 @@
     torque_command_topic: /exo/control/torque_command
     fault_event_topic: /exo/fault/event
     mode_state_topic: /exo/system/mode
+    calibration_status_topic: /exo/system/calibration_status
+    user_message_topic: /exo/system/user_message
     set_mode_service: /exo/system/set_mode
+    start_unit_service: /exo/system/start_unit
+    shutdown_unit_service: /exo/system/shutdown_unit
+    start_simulation_service: /exo/system/start_simulation
+    stop_simulation_service: /exo/system/stop_simulation
+    run_full_calibration_service: /exo/system/run_full_calibration
+    validate_calibration_service: /exo/system/validate_calibration

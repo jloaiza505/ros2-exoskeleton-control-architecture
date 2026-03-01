@@ -1,3 +1,9 @@
 <launch>
-  <!-- Placeholder launch file for exo_adaptation -->
+  <arg name="use_sim_time" default="false"/>
+
+  <node pkg="exo_adaptation" exec="adaptation_node" name="adaptation_node" output="screen">
+    <param from="$(find-pkg-share exo_system_config)/config/topics.yaml"/>
+    <param from="$(find-pkg-share exo_adaptation)/config/exo_adaptation.yaml"/>
+    <param name="use_sim_time" value="$(var use_sim_time)"/>
+  </node>
 </launch>

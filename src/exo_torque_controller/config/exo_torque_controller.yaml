@@ -3,6 +3,9 @@
     fused_state_topic: /exo/state/fused
     gait_phase_topic: /exo/gait/phase
     mode_state_topic: /exo/system/mode
+    adaptive_parameters_topic: /exo/adaptation/parameters
     torque_command_topic: /exo/control/torque_command
     max_torque_nm: 25.0
     velocity_damping_gain: 1.5
+    adaptation_timeout_s: 0.5
+    nominal_gait_cycle_s: 1.2

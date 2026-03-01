@@ -1,0 +1,17 @@
+/**:
+  ros__parameters:
+    mode_state_topic: /exo/system/mode
+    calibration_status_topic: /exo/system/calibration_status
+    user_message_topic: /exo/system/user_message
+    set_mode_service: /exo/system/set_mode
+    start_unit_service: /exo/system/start_unit
+    shutdown_unit_service: /exo/system/shutdown_unit
+    raw_sensor_topic: /exo/sensing/raw
+    fused_state_topic: /exo/state/fused
+    gait_phase_topic: /exo/gait/phase
+    offline_mode_value: OFFLINE
+    startup_mode_value: STARTUP
+    idle_mode_value: IDLE
+    calibration_mode_value: CALIBRATION
+    sensor_check_timeout_s: 2.0
+    sensor_freshness_timeout_s: 0.30

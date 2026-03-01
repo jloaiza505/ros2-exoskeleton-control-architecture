@@ -24,7 +24,7 @@ public:
     phase_faulted_(false),
     torque_faulted_(false),
     mode_seen_(false),
-    current_mode_("STARTUP") {
+    current_mode_("OFFLINE") {
     raw_sensor_topic_ = this->declare_parameter<std::string>("raw_sensor_topic", "/exo/sensing/raw");
     fused_state_topic_ = this->declare_parameter<std::string>("fused_state_topic", "/exo/state/fused");
     gait_phase_topic_ = this->declare_parameter<std::string>("gait_phase_topic", "/exo/gait/phase");
@@ -99,7 +99,7 @@ private:
       return false;
     }
 
-    if (current_mode_ == "STARTUP" || current_mode_ == "FAULT") {
+    if (current_mode_ == "OFFLINE" || current_mode_ == "STARTUP" || current_mode_ == "FAULT") {
       return false;
     }
 

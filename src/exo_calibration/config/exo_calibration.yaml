@@ -1,0 +1,24 @@
+/**:
+  ros__parameters:
+    fused_state_topic: /exo/state/fused
+    gait_phase_topic: /exo/gait/phase
+    mode_state_topic: /exo/system/mode
+    calibration_status_topic: /exo/system/calibration_status
+    user_message_topic: /exo/system/user_message
+    set_mode_service: /exo/system/set_mode
+    run_full_calibration_service: /exo/system/run_full_calibration
+    validate_calibration_service: /exo/system/validate_calibration
+    status_publish_rate_hz: 2.0
+    analysis_window_s: 3.0
+    min_samples: 30
+    max_velocity_ratio_delta: 0.35
+    max_confidence_delta: 0.20
+    max_contact_delta: 0.25
+    require_calibration_mode_for_full: true
+    baseline_store_path: /home/jaime/.ros/exo_calibration_baseline.yaml
+    auto_load_baseline: true
+    auto_save_baseline: true
+    auto_validate_on_idle_startup: true
+    startup_validation_delay_s: 3.0
+    startup_validation_mode: auto
+    auto_request_calibration_mode: true

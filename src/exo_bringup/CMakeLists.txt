@@ -8,13 +8,15 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(std_srvs REQUIRED)
+find_package(exo_interfaces REQUIRED)
 
 add_executable(bringup_node src/bringup_node.cpp)
 target_include_directories(bringup_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 target_compile_features(bringup_node PUBLIC cxx_std_17)
-ament_target_dependencies(bringup_node rclcpp std_msgs)
+ament_target_dependencies(bringup_node rclcpp std_msgs std_srvs exo_interfaces)
 
 install(TARGETS bringup_node
   DESTINATION lib/${PROJECT_NAME})

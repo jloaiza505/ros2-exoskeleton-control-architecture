@@ -11,6 +11,8 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/FusedLimbState.msg"
   "msg/GaitPhase.msg"
   "msg/AdaptiveParameters.msg"
+  "msg/CalibrationStatus.msg"
+  "msg/UserMessage.msg"
   "msg/TorqueCommand.msg"
   "msg/FaultEvent.msg"
   "srv/SetOperatingMode.srv"

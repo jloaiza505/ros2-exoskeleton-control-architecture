@@ -2,8 +2,12 @@
   ros__parameters:
     fault_event_topic: /exo/fault/event
     mode_state_topic: /exo/system/mode
+    calibration_status_topic: /exo/system/calibration_status
     set_mode_service: /exo/system/set_mode
-    initial_mode: STARTUP
+    initial_mode: OFFLINE
     startup_mode_duration_ms: 1000
+    startup_auto_transition_enabled: false
     mode_publish_rate_hz: 5.0
     fault_severity_threshold: 2
+    require_valid_calibration_for_assistive: true
+    calibration_status_timeout_s: 2.0

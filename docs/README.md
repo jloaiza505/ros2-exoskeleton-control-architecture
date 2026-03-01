@@ -5,6 +5,7 @@
 - [validation.md](validation.md)
 - [roadmap.md](roadmap.md)
 - [ui.md](ui.md)
+- [../ui/operator-dashboard/README.md](../ui/operator-dashboard/README.md)
 - [simulation_data_plan.md](simulation_data_plan.md)
 - `safety.md` (planned)
 - `adr/` for architecture decision records

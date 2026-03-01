@@ -61,17 +61,59 @@ Deliverables:
 - `docs/validation.md`
 - `exo_bringup_no_sim.launch.xml`
 
+### M6 - Adaptation + Calibration Baseline + Startup Orchestration
+
+- Implemented adaptation parameter publisher and controller integration.
+- Added calibration status manager with:
+  - baseline persistence (load/save),
+  - full calibration service,
+  - quick validation service,
+  - startup validation in `IDLE`.
+- Added operator-facing user message topic (`/exo/system/user_message`).
+- Added bringup orchestration services:
+  - `/exo/system/start_unit`
+  - `/exo/system/shutdown_unit`
+- Added OFFLINE behavior for power-on waiting state and startup/shutdown flow.
+- Added scenario launch files for valid/missing/invalid calibration startup testing.
+
+Deliverables:
+
+- `src/exo_adaptation/`
+- `src/exo_calibration/`
+- `src/exo_bringup/src/bringup_node.cpp`
+- `src/exo_bringup/launch/exo_bringup_scenario_*.launch.xml`
+
+### M7 - Operator UI Scaffold (Phase A, Initial)
+
+- Added React + TypeScript dashboard scaffold with rosbridge integration.
+- Added unit control actions (start/shutdown), mode requests, simulation control, and calibration actions.
+- Added subscriptions for mode, calibration status, gait estimate, and user messages.
+
+Deliverables:
+
+- `ui/operator-dashboard/`
+- `docs/ui.md`
+
 ## 3. Next Steps (Recommended Order)
 
-### N1 - Adaptation Layer Baseline
+### N1 - Per-User Adaptation Parameters
 
-- Implement `exo_adaptation` publisher for `AdaptiveParameters`.
-- Integrate adaptation input in torque controller.
+- Extend adaptation contract to include per-user and per-fit parameters:
+  - body mass,
+  - user height,
+  - configured lever geometry,
+  - optional limb-specific scaling terms.
+- Define source-of-truth ownership:
+  - user-entered metadata,
+  - calibration-estimated parameters,
+  - runtime-safe derived values consumed by control.
+- Keep torque controller integration bounded to validated/safe adaptation outputs.
 
 Success criteria:
 
-- Controller consumes adaptation topic.
-- Parameter updates visibly change torque profile.
+- Parameter schema clearly separates user-entered vs calibration-estimated fields.
+- Adaptation output remains stable and safe when input values are stale/missing.
+- Controller behavior changes only through validated adaptation parameters.
 
 ### N1.5 - OpenSim-Driven Simulation Input
 
@@ -102,6 +144,21 @@ Success criteria:
 
 - Invalid mode transitions rejected.
 - Fault and recovery behavior matches documented policy.
+
+### N2.5 - Operator UI Baseline (Execution + Runtime Tuning)
+
+- Expand current scaffold toward full Phase A dashboard from `docs/ui.md`:
+  - mode/safety control panel guardrails,
+  - real-time plots (torque, gait, state, sensor),
+  - status/freshness cards and event log filtering/export.
+- Add basic runtime configuration controls for safe, bounded parameter changes during execution (Phase B subset).
+- Keep mode/fault/readiness behavior authoritative from ROS topics/services and user message channel.
+
+Success criteria:
+
+- UI can drive mode transitions through `/exo/system/set_mode` and show confirmed `/exo/system/mode` updates.
+- During execution, operator can apply basic runtime config updates and observe effect on published control/state signals.
+- Fault events and stale/offline conditions are visible in the dashboard.
 
 ### N3 - Hardware Interface Abstraction
 

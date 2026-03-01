@@ -1,39 +1,139 @@
 <launch>
   <arg name="use_sim_time" default="false"/>
+  <arg name="compact_logs" default="false"/>
+  <arg name="calibration_baseline_store_path" default="/home/jaime/.ros/exo_calibration_baseline.yaml"/>
+  <arg name="calibration_auto_load_baseline" default="true"/>
+  <arg name="calibration_auto_save_baseline" default="true"/>
+  <arg name="calibration_auto_validate_on_idle_startup" default="true"/>
+  <arg name="calibration_startup_validation_delay_s" default="3.0"/>
+  <arg name="calibration_startup_validation_mode" default="auto"/>
+  <arg name="calibration_auto_request_calibration_mode" default="true"/>
+  <arg name="bringup_startup_mode_target" default="STARTUP"/>
+  <arg name="bringup_shutdown_mode_target" default="OFFLINE"/>
 
-  <node pkg="exo_simulation" exec="simulation_node" name="simulation_node" output="screen">
+  <group if="$(var compact_logs)">
+    <set_env name="RCUTILS_LOGGING_SEVERITY_THRESHOLD" value="WARN"/>
+    <set_env name="RCUTILS_LOGGING_MIN_SEVERITY" value="WARN"/>
+    <set_env name="RCUTILS_COLORIZED_OUTPUT" value="1"/>
+  </group>
+
+  <node pkg="exo_simulation" exec="simulation_node" name="simulation_node" output="screen" if="$(var compact_logs)" args="--ros-args --log-level WARN">
+    <param from="$(find-pkg-share exo_system_config)/config/system.yaml"/>
+    <param from="$(find-pkg-share exo_system_config)/config/topics.yaml"/>
+    <param from="$(find-pkg-share exo_simulation)/config/exo_simulation.yaml"/>
+    <param name="use_sim_time" value="$(var use_sim_time)"/>
+  </node>
+  <node pkg="exo_simulation" exec="simulation_node" name="simulation_node" output="screen" unless="$(var compact_logs)">
     <param from="$(find-pkg-share exo_system_config)/config/system.yaml"/>
     <param from="$(find-pkg-share exo_system_config)/config/topics.yaml"/>
     <param from="$(find-pkg-share exo_simulation)/config/exo_simulation.yaml"/>
     <param name="use_sim_time" value="$(var use_sim_time)"/>
   </node>
 
-  <node pkg="exo_state_estimator" exec="state_estimator_node" name="state_estimator_node" output="screen">
+  <node pkg="exo_state_estimator" exec="state_estimator_node" name="state_estimator_node" output="screen" if="$(var compact_logs)" args="--ros-args --log-level WARN">
+    <param from="$(find-pkg-share exo_system_config)/config/topics.yaml"/>
+    <param from="$(find-pkg-share exo_state_estimator)/config/exo_state_estimator.yaml"/>
+    <param name="use_sim_time" value="$(var use_sim_time)"/>
+  </node>
+  <node pkg="exo_state_estimator" exec="state_estimator_node" name="state_estimator_node" output="screen" unless="$(var compact_logs)">
     <param from="$(find-pkg-share exo_system_config)/config/topics.yaml"/>
     <param from="$(find-pkg-share exo_state_estimator)/config/exo_state_estimator.yaml"/>
     <param name="use_sim_time" value="$(var use_sim_time)"/>
   </node>
 
-  <node pkg="exo_gait_phase_detector" exec="gait_phase_detector_node" name="gait_phase_detector_node" output="screen">
+  <node pkg="exo_gait_phase_detector" exec="gait_phase_detector_node" name="gait_phase_detector_node" output="screen" if="$(var compact_logs)" args="--ros-args --log-level WARN">
+    <param from="$(find-pkg-share exo_system_config)/config/topics.yaml"/>
+    <param from="$(find-pkg-share exo_gait_phase_detector)/config/exo_gait_phase_detector.yaml"/>
+    <param name="use_sim_time" value="$(var use_sim_time)"/>
+  </node>
+  <node pkg="exo_gait_phase_detector" exec="gait_phase_detector_node" name="gait_phase_detector_node" output="screen" unless="$(var compact_logs)">
     <param from="$(find-pkg-share exo_system_config)/config/topics.yaml"/>
     <param from="$(find-pkg-share exo_gait_phase_detector)/config/exo_gait_phase_detector.yaml"/>
     <param name="use_sim_time" value="$(var use_sim_time)"/>
   </node>
 
-  <node pkg="exo_fault_manager" exec="fault_manager_node" name="fault_manager_node" output="screen">
+  <node pkg="exo_fault_manager" exec="fault_manager_node" name="fault_manager_node" output="screen" if="$(var compact_logs)" args="--ros-args --log-level WARN">
+    <param from="$(find-pkg-share exo_system_config)/config/topics.yaml"/>
+    <param from="$(find-pkg-share exo_fault_manager)/config/exo_fault_manager.yaml"/>
+    <param name="use_sim_time" value="$(var use_sim_time)"/>
+  </node>
+  <node pkg="exo_fault_manager" exec="fault_manager_node" name="fault_manager_node" output="screen" unless="$(var compact_logs)">
     <param from="$(find-pkg-share exo_system_config)/config/topics.yaml"/>
     <param from="$(find-pkg-share exo_fault_manager)/config/exo_fault_manager.yaml"/>
     <param name="use_sim_time" value="$(var use_sim_time)"/>
   </node>
 
-  <node pkg="exo_torque_controller" exec="torque_controller_node" name="torque_controller_node" output="screen">
+  <node pkg="exo_bringup" exec="bringup_node" name="bringup_node" output="screen" if="$(var compact_logs)" args="--ros-args --log-level WARN">
+    <param from="$(find-pkg-share exo_system_config)/config/topics.yaml"/>
+    <param from="$(find-pkg-share exo_bringup)/config/exo_bringup.yaml"/>
+    <param name="startup_mode_target" value="$(var bringup_startup_mode_target)"/>
+    <param name="shutdown_mode_target" value="$(var bringup_shutdown_mode_target)"/>
+    <param name="use_sim_time" value="$(var use_sim_time)"/>
+  </node>
+  <node pkg="exo_bringup" exec="bringup_node" name="bringup_node" output="screen" unless="$(var compact_logs)">
+    <param from="$(find-pkg-share exo_system_config)/config/topics.yaml"/>
+    <param from="$(find-pkg-share exo_bringup)/config/exo_bringup.yaml"/>
+    <param name="startup_mode_target" value="$(var bringup_startup_mode_target)"/>
+    <param name="shutdown_mode_target" value="$(var bringup_shutdown_mode_target)"/>
+    <param name="use_sim_time" value="$(var use_sim_time)"/>
+  </node>
+
+  <node pkg="exo_calibration" exec="calibration_node" name="calibration_node" output="screen" if="$(var compact_logs)" args="--ros-args --log-level WARN">
+    <param from="$(find-pkg-share exo_system_config)/config/topics.yaml"/>
+    <param from="$(find-pkg-share exo_calibration)/config/exo_calibration.yaml"/>
+    <param name="baseline_store_path" value="$(var calibration_baseline_store_path)"/>
+    <param name="auto_load_baseline" value="$(var calibration_auto_load_baseline)"/>
+    <param name="auto_save_baseline" value="$(var calibration_auto_save_baseline)"/>
+    <param name="auto_validate_on_idle_startup" value="$(var calibration_auto_validate_on_idle_startup)"/>
+    <param name="startup_validation_delay_s" value="$(var calibration_startup_validation_delay_s)"/>
+    <param name="startup_validation_mode" value="$(var calibration_startup_validation_mode)"/>
+    <param name="auto_request_calibration_mode" value="$(var calibration_auto_request_calibration_mode)"/>
+    <param name="use_sim_time" value="$(var use_sim_time)"/>
+  </node>
+  <node pkg="exo_calibration" exec="calibration_node" name="calibration_node" output="screen" unless="$(var compact_logs)">
+    <param from="$(find-pkg-share exo_system_config)/config/topics.yaml"/>
+    <param from="$(find-pkg-share exo_calibration)/config/exo_calibration.yaml"/>
+    <param name="baseline_store_path" value="$(var calibration_baseline_store_path)"/>
+    <param name="auto_load_baseline" value="$(var calibration_auto_load_baseline)"/>
+    <param name="auto_save_baseline" value="$(var calibration_auto_save_baseline)"/>
+    <param name="auto_validate_on_idle_startup" value="$(var calibration_auto_validate_on_idle_startup)"/>
+    <param name="startup_validation_delay_s" value="$(var calibration_startup_validation_delay_s)"/>
+    <param name="startup_validation_mode" value="$(var calibration_startup_validation_mode)"/>
+    <param name="auto_request_calibration_mode" value="$(var calibration_auto_request_calibration_mode)"/>
+    <param name="use_sim_time" value="$(var use_sim_time)"/>
+  </node>
+
+  <node pkg="exo_adaptation" exec="adaptation_node" name="adaptation_node" output="screen" if="$(var compact_logs)" args="--ros-args --log-level WARN">
+    <param from="$(find-pkg-share exo_system_config)/config/topics.yaml"/>
+    <param from="$(find-pkg-share exo_adaptation)/config/exo_adaptation.yaml"/>
+    <param name="use_sim_time" value="$(var use_sim_time)"/>
+  </node>
+  <node pkg="exo_adaptation" exec="adaptation_node" name="adaptation_node" output="screen" unless="$(var compact_logs)">
+    <param from="$(find-pkg-share exo_system_config)/config/topics.yaml"/>
+    <param from="$(find-pkg-share exo_adaptation)/config/exo_adaptation.yaml"/>
+    <param name="use_sim_time" value="$(var use_sim_time)"/>
+  </node>
+
+  <node pkg="exo_torque_controller" exec="torque_controller_node" name="torque_controller_node" output="screen" if="$(var compact_logs)" args="--ros-args --log-level WARN">
+    <param from="$(find-pkg-share exo_system_config)/config/system.yaml"/>
+    <param from="$(find-pkg-share exo_system_config)/config/topics.yaml"/>
+    <param from="$(find-pkg-share exo_torque_controller)/config/exo_torque_controller.yaml"/>
+    <param name="use_sim_time" value="$(var use_sim_time)"/>
+  </node>
+  <node pkg="exo_torque_controller" exec="torque_controller_node" name="torque_controller_node" output="screen" unless="$(var compact_logs)">
     <param from="$(find-pkg-share exo_system_config)/config/system.yaml"/>
     <param from="$(find-pkg-share exo_system_config)/config/topics.yaml"/>
     <param from="$(find-pkg-share exo_torque_controller)/config/exo_torque_controller.yaml"/>
     <param name="use_sim_time" value="$(var use_sim_time)"/>
   </node>
 
-  <node pkg="exo_watchdog" exec="watchdog_node" name="watchdog_node" output="screen">
+  <node pkg="exo_watchdog" exec="watchdog_node" name="watchdog_node" output="screen" if="$(var compact_logs)" args="--ros-args --log-level WARN">
+    <param from="$(find-pkg-share exo_system_config)/config/faults.yaml"/>
+    <param from="$(find-pkg-share exo_system_config)/config/topics.yaml"/>
+    <param from="$(find-pkg-share exo_watchdog)/config/exo_watchdog.yaml"/>
+    <param name="use_sim_time" value="$(var use_sim_time)"/>
+  </node>
+  <node pkg="exo_watchdog" exec="watchdog_node" name="watchdog_node" output="screen" unless="$(var compact_logs)">
     <param from="$(find-pkg-share exo_system_config)/config/faults.yaml"/>
     <param from="$(find-pkg-share exo_system_config)/config/topics.yaml"/>
     <param from="$(find-pkg-share exo_watchdog)/config/exo_watchdog.yaml"/>

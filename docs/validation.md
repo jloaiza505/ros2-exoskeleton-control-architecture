@@ -10,6 +10,8 @@ This document defines repeatable acceptance checks for the current vertical slic
 - `exo_torque_controller`
 - `exo_watchdog`
 - `exo_fault_manager`
+- `exo_calibration`
+- `exo_bringup`
 
 ## 2. Preconditions
 
@@ -46,12 +48,15 @@ ros2 launch exo_bringup exo_bringup.launch.xml
 - `torque_controller_node`
 - `watchdog_node`
 - `fault_manager_node`
+- `calibration_node`
+- `bringup_node`
 
 Pass criteria:
 
 - No process exits unexpectedly.
 - No startup exceptions.
-- Mode sequence observed in logs/topic: `STARTUP -> IDLE`.
+- `UNIT_OFFLINE_READY` appears on `/exo/system/user_message`.
+- Mode starts in `OFFLINE` (or project-configured startup baseline).
 
 ## 4. Test Case VC-002: Raw Sensor Rate
 
@@ -72,11 +77,11 @@ Pass criteria:
 - Mean rate approximately 200 Hz (expected from `exo_simulation` config).
 - Typical acceptable band for this prototype: 190-210 Hz.
 
-## 5. Test Case VC-003: Mode-Gated Torque
+## 5. Test Case VC-003: Unit Startup Sequence and Mode-Gated Torque
 
 Objective:
 
-- Verify torque output is gated by operating mode.
+- Verify orchestrated startup (`start_unit`) and torque gating by operating mode.
 
 Steps:
 
@@ -92,7 +97,13 @@ ros2 topic echo /exo/control/torque_command
 ros2 topic echo /exo/system/mode
 ```
 
-3. Transition modes:
+3. Start unit:
+
+```bash
+ros2 service call /exo/system/start_unit std_srvs/srv/Trigger "{}"
+```
+
+4. Transition modes:
 
 ```bash
 ros2 service call /exo/system/set_mode exo_interfaces/srv/SetOperatingMode "{mode: CALIBRATION}"
@@ -101,6 +112,7 @@ ros2 service call /exo/system/set_mode exo_interfaces/srv/SetOperatingMode "{mod
 
 Pass criteria:
 
+- Startup user messages are emitted (sensor check + calibration readiness decision).
 - In `STARTUP`, `IDLE`, and `CALIBRATION`: torque command is zero.
 - In `ASSISTIVE`: nonzero torque commands appear.
 
@@ -152,7 +164,13 @@ Steps:
 ros2 launch exo_bringup exo_bringup_no_sim.launch.xml
 ```
 
-2. Observe:
+2. Start unit:
+
+```bash
+ros2 service call /exo/system/start_unit std_srvs/srv/Trigger "{}"
+```
+
+3. Observe:
 
 ```bash
 ros2 topic echo /exo/fault/event
@@ -162,10 +180,54 @@ ros2 topic echo /exo/system/mode
 Pass criteria:
 
 - Timeout faults appear due to missing upstream sensor feed.
-- Mode progression is `STARTUP -> IDLE -> FAULT`.
+- Mode progression includes startup request and eventual transition to `FAULT` due to missing streams.
 
-## 8. Known Limitations (Current Phase)
+## 8. Test Case VC-006: Calibration Scenario Launch Profiles
+
+Objective:
+
+- Validate expected startup behavior for valid/missing/invalid baseline conditions.
+
+Steps:
+
+1. Valid baseline scenario:
+
+```bash
+ros2 launch exo_bringup exo_bringup_scenario_valid_calibration.launch.xml
+ros2 service call /exo/system/start_unit std_srvs/srv/Trigger "{}"
+```
+
+Expected:
+- Startup quick validation forced valid.
+- User message indicates ready for assistive from `IDLE`.
+
+2. Missing baseline scenario:
+
+```bash
+ros2 launch exo_bringup exo_bringup_scenario_missing_calibration.launch.xml
+ros2 service call /exo/system/start_unit std_srvs/srv/Trigger "{}"
+```
+
+Expected:
+- Baseline not found.
+- User message requests full calibration.
+- System enters/requests `CALIBRATION`.
+
+3. Invalid baseline scenario:
+
+```bash
+ros2 launch exo_bringup exo_bringup_scenario_invalid_calibration.launch.xml
+ros2 service call /exo/system/start_unit std_srvs/srv/Trigger "{}"
+```
+
+Expected:
+- Startup quick validation forced invalid.
+- User message indicates recalibration required.
+- System enters/requests `CALIBRATION`.
+
+## 9. Known Limitations (Current Phase)
 
 - Duplicate/near-duplicate torque messages can appear because controller publishes when either phase or fused-state callback arrives.
 - Watchdog checks are mode-aware and include a post-mode-change grace period; timeout values may still need tuning for slower machines.
 - No lifecycle-node orchestration yet.
+- Calibration flow currently uses placeholder feature estimates; final walk-task calibration protocol is pending.

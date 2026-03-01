@@ -1,0 +1,9 @@
+<launch>
+  <include file="$(find-pkg-share exo_bringup)/launch/exo_bringup.launch.xml">
+    <arg name="compact_logs" value="true"/>
+    <arg name="calibration_baseline_store_path" value="/tmp/exo_missing_baseline.yaml"/>
+    <arg name="calibration_auto_load_baseline" value="true"/>
+    <arg name="calibration_auto_validate_on_idle_startup" value="false"/>
+    <arg name="calibration_auto_request_calibration_mode" value="true"/>
+  </include>
+</launch>

@@ -17,10 +17,13 @@ This document is implementation-agnostic and can be used later to generate inter
 
 Phase 1 UI covers simulation + vertical-slice runtime and includes:
 
+- Unit lifecycle control (`OFFLINE` -> startup checks -> `IDLE`, and shutdown back to `OFFLINE`).
 - Mode control (`IDLE`, `CALIBRATION`, `ASSISTIVE`, reset from `FAULT`).
+- Calibration workflow controls (full calibration + validation).
+- Simulation controls (start/stop walking simulation stream).
 - Real-time plots for torque, gait, and key sensor/state signals.
 - System health/fault panel with watchdog and fault manager visibility.
-- Session logging and test-run annotations.
+- Operator message stream from backend (`/exo/system/user_message`).
 
 Out of scope for Phase 1:
 
@@ -33,6 +36,8 @@ Out of scope for Phase 1:
 ### 3.1 Subscribed Topics
 
 - `/exo/system/mode` (`std_msgs/String`)
+- `/exo/system/calibration_status` (`exo_interfaces/msg/CalibrationStatus`)
+- `/exo/system/user_message` (`exo_interfaces/msg/UserMessage`)
 - `/exo/fault/event` (`exo_interfaces/msg/FaultEvent`)
 - `/exo/control/torque_command` (`exo_interfaces/msg/TorqueCommand`)
 - `/exo/gait/phase` (`exo_interfaces/msg/GaitPhase`)
@@ -42,6 +47,12 @@ Out of scope for Phase 1:
 ### 3.2 Called Services
 
 - `/exo/system/set_mode` (`exo_interfaces/srv/SetOperatingMode`)
+- `/exo/system/start_unit` (`std_srvs/srv/Trigger`)
+- `/exo/system/shutdown_unit` (`std_srvs/srv/Trigger`)
+- `/exo/system/start_simulation` (`std_srvs/srv/Trigger`)
+- `/exo/system/stop_simulation` (`std_srvs/srv/Trigger`)
+- `/exo/system/run_full_calibration` (`std_srvs/srv/Trigger`)
+- `/exo/system/validate_calibration` (`std_srvs/srv/Trigger`)
 
 ### 3.3 Derived UI Signals
 
@@ -58,7 +69,7 @@ Single-page dashboard with five regions:
 2. Mode & Safety Control Panel
 3. Real-Time Plot Area
 4. System Status Cards
-5. Event Log
+5. User Message / Event Log
 
 ## 5. Panels and Behavior
 
@@ -80,26 +91,36 @@ Actions:
 
 Shows:
 
-- Current mode badge (`STARTUP`, `IDLE`, `CALIBRATION`, `ASSISTIVE`, `FAULT`).
+- Current mode badge (`OFFLINE`, `STARTUP`, `IDLE`, `CALIBRATION`, `ASSISTIVE`, `FAULT`).
 - Last mode transition reason (if available).
 - Fault state indicator (`NORMAL`, `WARNING`, `FAULT`).
+- Calibration readiness (`UNKNOWN`, `MISSING`, `VALID`, `INVALID`) with detail string.
 
 Controls:
 
+- `Start Unit` (calls `/exo/system/start_unit`)
+- `Shutdown Unit` (calls `/exo/system/shutdown_unit`)
 - `Set CALIBRATION`
 - `Set ASSISTIVE`
 - `Set IDLE`
 - `Reset to IDLE` (enabled only when current mode is `FAULT`)
+- `Run Full Calibration + Validate`
+- `Validate Calibration`
+- `Start Simulation Walk`
+- `Stop Simulation Walk`
 
 Service behavior:
 
 - Every mode button calls `/exo/system/set_mode`.
+- Unit buttons call `/exo/system/start_unit` and `/exo/system/shutdown_unit`.
+- Simulation buttons call `/exo/system/start_simulation` and `/exo/system/stop_simulation`.
+- Calibration buttons call full and validate calibration trigger services.
 - UI displays service result (`accepted`, `message`).
 - Reject transitions in UI without changing local state.
 
 Safety UX rules:
 
-- `ASSISTIVE` button disabled unless current mode is `CALIBRATION`.
+- `ASSISTIVE` button disabled unless current mode is `IDLE` with valid calibration.
 - In `FAULT`, action buttons are locked except reset path.
 - Display explicit warning before assistive activation.
 
@@ -154,13 +175,14 @@ Color semantics:
 - Amber: stale nearing timeout.
 - Red: timeout/fault.
 
-### 5.5 Event Log
+### 5.5 User Message / Event Log
 
 Shows timestamped stream entries:
 
 - Mode transitions
 - Fault events (source, type, severity, detail)
 - Service responses
+- `/exo/system/user_message` entries (`INFO`, `WARNING`, `ERROR`)
 - Manual operator notes
 
 Log controls:
@@ -214,7 +236,32 @@ Phase C:
 - Add hardware interface diagnostics panel.
 - Add rosbag integration controls.
 
-## 10. Acceptance Criteria
+## 10. Current Scaffold Status (March 2026)
+
+Implemented in `ui/operator-dashboard`:
+
+- rosbridge connection indicator.
+- Subscriptions:
+  - `/exo/system/mode`
+  - `/exo/system/calibration_status`
+  - `/exo/system/user_message`
+  - `/exo/gait/phase`
+- Controls:
+  - `start_unit`, `shutdown_unit`
+  - `set_mode`
+  - `start_simulation`, `stop_simulation`
+  - `run_full_calibration`, `validate_calibration`
+- Current gait label/value display.
+- User message list for operator-visible readiness and warning/error states.
+
+Still pending for full Phase 1:
+
+- Real-time plots.
+- Topic freshness/rate health cards.
+- Log export and richer filtering.
+- Assistive transition confirmation guardrail UX.
+
+## 11. Acceptance Criteria
 
 The UI is considered Phase 1 complete when:
 
@@ -227,7 +274,7 @@ The UI is considered Phase 1 complete when:
 4. System status cards correctly show topic freshness and stale conditions.
 5. Event log captures mode transitions and fault details for export.
 
-## 11. Suggested Future Document Split
+## 12. Suggested Future Document Split
 
 As UI grows, split into:
 

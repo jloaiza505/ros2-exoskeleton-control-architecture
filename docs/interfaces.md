@@ -25,7 +25,15 @@ Canonical names:
 - Torque command: `/exo/control/torque_command`
 - Fault event: `/exo/fault/event`
 - Mode state: `/exo/system/mode`
+- Calibration status: `/exo/system/calibration_status`
+- User message: `/exo/system/user_message`
 - Mode service: `/exo/system/set_mode`
+- Start unit service: `/exo/system/start_unit`
+- Shutdown unit service: `/exo/system/shutdown_unit`
+- Start simulation service: `/exo/system/start_simulation`
+- Stop simulation service: `/exo/system/stop_simulation`
+- Full calibration service: `/exo/system/run_full_calibration`
+- Calibration validation service: `/exo/system/validate_calibration`
 
 ## 3. Messages
 
@@ -127,6 +135,41 @@ Contract:
 - Emitted by watchdog and fault manager.
 - `severity` follows project-level criticality mapping.
 
+### 3.7 `exo_interfaces/msg/CalibrationStatus.msg`
+
+Fields:
+
+- `std_msgs/Header header`
+- `uint8 UNKNOWN=0`
+- `uint8 MISSING=1`
+- `uint8 VALID=2`
+- `uint8 INVALID=3`
+- `uint8 status`
+- `string detail`
+
+Contract:
+
+- Published by calibration workflow/status owner.
+- `status=VALID` is required to allow transition to `ASSISTIVE`.
+- `detail` provides operator-facing reason when not valid.
+
+### 3.8 `exo_interfaces/msg/UserMessage.msg`
+
+Fields:
+
+- `std_msgs/Header header`
+- `uint8 INFO=0`
+- `uint8 WARNING=1`
+- `uint8 ERROR=2`
+- `uint8 severity`
+- `string code`
+- `string text`
+
+Contract:
+
+- Published by supervisory/workflow nodes for operator-facing state.
+- Intended as the GUI-facing message channel for readiness, calibration requirements, and actionable warnings.
+
 ## 4. Services
 
 ### 4.1 `exo_interfaces/srv/SetOperatingMode.srv`
@@ -143,8 +186,110 @@ Response:
 Contract:
 
 - Used by supervisory logic or operator tooling.
-- Expected requested mode values: `IDLE`, `CALIBRATION`, `ASSISTIVE`, `FAULT`.
-- `STARTUP` is an internal mode set by fault manager on bringup and is not accepted through the service.
+- Expected requested mode values: `OFFLINE`, `STARTUP`, `IDLE`, `CALIBRATION`, `ASSISTIVE`, `FAULT`.
+- `OFFLINE` and `STARTUP` are used by startup/shutdown orchestration flow.
+
+### 4.2 `/exo/system/run_full_calibration` (`std_srvs/srv/Trigger`)
+
+Request:
+
+- Empty
+
+Response:
+
+- `bool success`
+- `string message`
+
+Contract:
+
+- Runs full calibration against recent gait/state window.
+- Expected to be called during `CALIBRATION` mode.
+- On success, runs validation and updates calibration status to `VALID`.
+- On successful validation, requests transition to `IDLE`.
+- Stores baseline metrics for future startup validation.
+
+### 4.3 `/exo/system/start_unit` (`std_srvs/srv/Trigger`)
+
+Request:
+
+- Empty
+
+Response:
+
+- `bool success`
+- `string message`
+
+Contract:
+
+- Triggers startup orchestration from UI/operator command.
+- Requests system mode transition to configured startup target (`STARTUP` by default).
+- Publishes user-facing startup result on `/exo/system/user_message`.
+
+### 4.4 `/exo/system/shutdown_unit` (`std_srvs/srv/Trigger`)
+
+Request:
+
+- Empty
+
+Response:
+
+- `bool success`
+- `string message`
+
+Contract:
+
+- Triggers safe shutdown orchestration from UI/operator command.
+- Requests system mode transition to `IDLE` and then configured shutdown target (`OFFLINE` by default).
+- Publishes user-facing shutdown result on `/exo/system/user_message`.
+
+### 4.5 `/exo/system/start_simulation` (`std_srvs/srv/Trigger`)
+
+Request:
+
+- Empty
+
+Response:
+
+- `bool success`
+- `string message`
+
+Contract:
+
+- Starts simulation gait publishing to emulate user walking.
+- Emits operator-facing message on `/exo/system/user_message`.
+
+### 4.6 `/exo/system/stop_simulation` (`std_srvs/srv/Trigger`)
+
+Request:
+
+- Empty
+
+Response:
+
+- `bool success`
+- `string message`
+
+Contract:
+
+- Stops simulation gait publishing.
+- Emits operator-facing message on `/exo/system/user_message`.
+
+### 4.7 `/exo/system/validate_calibration` (`std_srvs/srv/Trigger`)
+
+Request:
+
+- Empty
+
+Response:
+
+- `bool success`
+- `string message`
+
+Contract:
+
+- Runs short validation against stored calibration baseline.
+- Sets calibration status to `VALID` or `INVALID`/`MISSING` based on result.
+- Intended for startup quick-check when a persisted baseline exists.
 
 ## 5. QoS and Timing (Baseline)
 
@@ -159,4 +304,5 @@ Contract:
 - Only gait detector writes `GaitPhase`.
 - Only torque controller writes `TorqueCommand`.
 - Watchdog/fault manager write `FaultEvent`.
+- Calibration manager writes `CalibrationStatus`.
 - No package should publish another layer's contract topic.
